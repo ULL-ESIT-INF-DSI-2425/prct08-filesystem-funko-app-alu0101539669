@@ -12,7 +12,7 @@
 import { Tipo, Genero } from './type.js';
 
 /**
- * Clase FUnko
+ * Clase Funko
  */
 export class Funko {
 
