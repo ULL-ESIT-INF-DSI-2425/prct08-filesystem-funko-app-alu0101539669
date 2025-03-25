@@ -93,7 +93,7 @@ export function addFunko(id:number, usuario:string, nombre: string, descripcion:
     }
     // si el funko no existe, lo añado
     const funco_aux = new Funko(nombre, descripcion, tipo, genero, franquicia, numero, exclusivo, caracteristicasEspeciales, valorMercado, id);
-    writeFileSync("./database/" + usuario + "/" + nombre + ".json", JSON.stringify(funco_aux)); // escribir el funko en un fichero
+    writeFileSync("./database/" + usuario + "/" + nombre + ".json", JSON.stringify(funco_aux)); // escribir el funko en un fichero , JSON.stringify convierte un objeto o valor de JavaScript en una cadena de texto JSON
     console.log(chalk.green(`Funko added to ${usuario} collection!`));  // mensaje de éxito
   }
   return bandera;
@@ -113,7 +113,7 @@ export function eliminarFunko(usuario:string, ID_: number): boolean {
     console.log(chalk.red(`User ${usuario} does not exist`));
     return false;
   }
-  const filenames = readdirSync("./database/" + nombre_usuario);
+  const filenames = readdirSync("./database/" + nombre_usuario); 
 
   // comprobar que el funko existe
   let bandera = false;
@@ -121,7 +121,7 @@ export function eliminarFunko(usuario:string, ID_: number): boolean {
   // recorrer los ficheros de la carpeta del usuario
   filenames.forEach((file) => {
     const contenido = readFileSync("./database/" + nombre_usuario + "/" + file, 'utf8');
-    const json = JSON.parse(contenido);
+    const json = JSON.parse(contenido); // JSON.parse convierte una cadena de texto JSON en un objeto de JavaScript
     // si el id del funko es igual al id que se quiere eliminar, el funko existe
     if (json.ID === ID_) { 
       bandera = true;
