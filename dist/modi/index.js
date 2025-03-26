@@ -12,7 +12,7 @@ eliminarArchivo('./archivo.txt', './papelera', (err) => {
 });
 //listar 
 // Listamos los archivos
-listarArchivos('./src', (err, archivos) => {
+listarArchivos('./', (err, archivos) => {
     if (err) {
         console.error('Error al listar archivos:', err.message);
         return;
