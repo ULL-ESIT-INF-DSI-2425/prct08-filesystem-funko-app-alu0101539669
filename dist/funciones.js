@@ -1,19 +1,20 @@
 import { Funko } from "./funko.js";
-import { readFileSync, readdirSync, writeFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
-import chalk from "chalk";
-import { Genero, Tipo } from "./type.js";
+import { readFileSync, readdirSync, writeFileSync, unlinkSync, existsSync, mkdirSync } from 'fs'; // importar funciones de sistema de ficheros
+import chalk from "chalk"; // importar chalk para los colores
+import { Genero, Tipo } from "./type.js"; // importar los enums de tipo y genero
 /**
  * función que lee todos los funkos de un usuario
  * @param usuario usuario del que se quieren leer los funkos
  * @returns array de funkos del usuario
  */
 export function leerFunkos(usuario) {
-    const nombre_usuario = usuario;
-    const filenames = readdirSync("./database/" + nombre_usuario);
-    const lista_funkos = [];
+    const nombre_usuario = usuario; // nombre del usuario
+    const filenames = readdirSync("./database/" + nombre_usuario); // leer los ficheros de la carpeta del usuario
+    const lista_funkos = []; // lista de funkos del usuario
     filenames.forEach((file) => {
-        const contenido = readFileSync("./database/" + nombre_usuario + "/" + file, 'utf8');
-        const json = JSON.parse(contenido);
+        const contenido = readFileSync("./database/" + nombre_usuario + "/" + file, 'utf8'); // leer el contenido del fichero
+        const json = JSON.parse(contenido); // parsear el contenido del fichero
+        // crear un funko con los datos del fichero
         lista_funkos.push(new Funko(json.nombre, json.descripcion, json.tipo, json.genero, json.franquicia, json.numero, json.exclusivo, json.caracteristicasEspeciales, json.valorMercado, json.ID));
     });
     return lista_funkos;
@@ -36,48 +37,56 @@ export function leerFunkos(usuario) {
 export function addFunko(id, usuario, nombre, descripcion, tipo, genero, franquicia, numero, exclusivo, caracteristicasEspeciales, valorMercado) {
     // 1. comprobar que el usuario existe
     const nombre_usuario = usuario;
-    const path = "./database/" + nombre_usuario;
+    const path = "./database/" + nombre_usuario; // path de la carpeta del usuario
     if (existsSync(path) === false) {
         // si no existe la carpeta del usuario, la creo
-        mkdirSync("./database/" + nombre_usuario);
+        mkdirSync("./database/" + nombre_usuario); // creo la carpeta del usuario
     }
-    const filenames = readdirSync("./database/" + nombre_usuario);
-    let bandera = true;
+    // 2. comprobar que el funko no existe
+    const filenames = readdirSync("./database/" + nombre_usuario); // leer los ficheros de la carpeta del usuario
+    let bandera = true; // bandera para comprobar si el funko ya existe
+    // recorrer los ficheros de la carpeta del usuario
     filenames.forEach((file) => {
         const contenido = readFileSync("./database/" + nombre_usuario + "/" + file, 'utf8');
         const json = JSON.parse(contenido);
+        // si el id del funko es igual al id que se quiere añadir, el funko ya existe
         if (json.ID === id) {
-            // el funko ya existe
             bandera = false;
             console.log(chalk.red(`Funko already exists at ${json.user} collection!`));
         }
     });
+    // 3. si el funko no existe, lo añado
     if (bandera === true) {
-        const array_tipos = Object.values(Tipo);
-        let bandera_tipo = false;
+        const array_tipos = Object.values(Tipo); // array de tipos
+        let bandera_tipo = false; // bandera para comprobar si el tipo existe
+        // recorrer el array de tipos
         array_tipos.forEach((tipo_aux) => {
             if (tipo_aux === tipo) {
                 bandera_tipo = true;
             }
         });
+        // si el tipo no existe, muestro un mensaje de error
         if (bandera_tipo === false) {
             console.log(chalk.red(`Tipo ${tipo} does not exist`));
             return false;
         }
-        const array_generos = Object.values(Genero);
-        let bandera_genero = false;
+        const array_generos = Object.values(Genero); // array de generos
+        let bandera_genero = false; // bandera para comprobar si el genero existe
+        // recorrer el array de generos
         array_generos.forEach((genero_aux) => {
             if (genero_aux === genero) {
                 bandera_genero = true;
             }
         });
+        // si el genero no existe, muestro un mensaje de error
         if (bandera_genero === false) {
             console.log(chalk.red(`Genero ${genero} does not exist`));
             return false;
         }
+        // si el funko no existe, lo añado
         const funco_aux = new Funko(nombre, descripcion, tipo, genero, franquicia, numero, exclusivo, caracteristicasEspeciales, valorMercado, id);
-        writeFileSync("./database/" + usuario + "/" + nombre + ".json", JSON.stringify(funco_aux));
-        console.log(chalk.green(`Funko added to ${usuario} collection!`));
+        writeFileSync("./database/" + usuario + "/" + nombre + ".json", JSON.stringify(funco_aux)); // escribir el funko en un fichero , JSON.stringify convierte un objeto o valor de JavaScript en una cadena de texto JSON
+        console.log(chalk.green(`Funko added to ${usuario} collection!`)); // mensaje de éxito
     }
     return bandera;
 }
@@ -99,21 +108,23 @@ export function eliminarFunko(usuario, ID_) {
     // comprobar que el funko existe
     let bandera = false;
     let nombre_aux = 0;
+    // recorrer los ficheros de la carpeta del usuario
     filenames.forEach((file) => {
         const contenido = readFileSync("./database/" + nombre_usuario + "/" + file, 'utf8');
-        const json = JSON.parse(contenido);
+        const json = JSON.parse(contenido); // JSON.parse convierte una cadena de texto JSON en un objeto de JavaScript
+        // si el id del funko es igual al id que se quiere eliminar, el funko existe
         if (json.ID === ID_) {
-            // el funko ya existe
             bandera = true;
             nombre_aux = json.nombre;
         }
     });
+    // si el funko no existe, muestro un mensaje de error
     if (bandera === false) {
         console.log(chalk.red(`Funko not found at ${usuario} collection!`));
         return false;
     }
+    // si el funko existe, elimino el fichero correspondiente
     else {
-        // eliminar el fichero correspondiente al funko
         unlinkSync("./database/" + usuario + "/" + nombre_aux + ".json");
         console.log(chalk.green(`Funko removed from ${usuario} collection!`));
         return true;

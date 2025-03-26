@@ -19,4 +19,5 @@ export enum Tipo {
     Deportes = "Deportes",
     Musica = "Música",
     Anime = "Anime",
-  }
+    }
+     
